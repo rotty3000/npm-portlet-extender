@@ -30,16 +30,36 @@ public class NPMPortletExtender extends BundleTracker<ServiceRegistration<Portle
 		Bundle[] bundles = getBundles();
 		
 		for (Bundle bundle : bundles) {
-			// md = getMetadata(bundle)
 			Dictionary<String, String> headers = bundle.getHeaders();
 			
-			// check if bundle has Require-Capability: osgi.extender;filter:="(osgi.extender=liferay.npm.portlet)"
+			Enumeration<String> keys = headers.keys();
 			
+			while(keys.hasMoreElements()) {
+				String key = keys.nextElement();
+				
+				if (key.equals("Require-Capability")) {
+					String value = headers.get(key);
+					
+					if (value.contains("osgi.extender;filter:=\"(osgi.extender=liferay.npm.portlet)")) {
+						NPMPortletMetadata metadata = _getMetaData();
+						
+						System.out.println("Registering NPM portlet...");
+						
+						// Register portlet service using metadata
+						
+						break;
+					}
+				}
+			}
 			
-
 			// p = createPortlet(md)
 			// registerPortlet(p, md)
 		}
+	}
+
+	private NPMPortletMetadata _getMetaData() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	@Override
