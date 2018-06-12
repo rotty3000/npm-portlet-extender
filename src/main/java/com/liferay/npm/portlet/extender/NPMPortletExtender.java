@@ -108,6 +108,25 @@ public class NPMPortletExtender implements BundleActivator {
 									}
 									
 									writer.println("<p>Hello, world!</p>");
+									
+									URL jsonURL = bundle.getResource("META-INF/resources/div.txt");
+
+									URLConnection urlConnection = null;
+									InputStream inputStream = null;
+									String div = null;
+									
+									try {
+										urlConnection = jsonURL.openConnection();
+
+										inputStream = urlConnection.getInputStream();
+
+										div = StringUtil.read(inputStream);
+									}
+									catch (IOException ioe) {
+										ioe.printStackTrace();
+									}
+
+									writer.write(div);
 								}
 
 							};
