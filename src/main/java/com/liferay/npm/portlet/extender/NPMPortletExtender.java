@@ -104,8 +104,6 @@ public class NPMPortletExtender implements BundleActivator {
 										_logger.error(ioe.getLocalizedMessage());
 									}
 									
-									writer.println("<p>Hello, world!</p>");
-									
 									URL divTxtURL = bundle.getResource("META-INF/resources/div.txt");
 
 									URLConnection urlConnection = null;
@@ -122,6 +120,14 @@ public class NPMPortletExtender implements BundleActivator {
 									catch (IOException ioe) {
 										ioe.printStackTrace();
 									}
+									
+									String namespace = response.getNamespace();
+									
+									div = div.replace("${portletNamespace}", namespace);
+									
+									String contextPath = request.getContextPath();
+									
+									div = div.replace("${contextPath}", contextPath);
 
 									writer.write(div);
 								}
