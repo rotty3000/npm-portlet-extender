@@ -18,7 +18,6 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleCapability;
 import org.osgi.framework.wiring.BundleWire;
@@ -107,14 +106,14 @@ public class NPMPortletExtender implements BundleActivator {
 									
 									writer.println("<p>Hello, world!</p>");
 									
-									URL jsonURL = bundle.getResource("META-INF/resources/div.txt");
+									URL divTxtURL = bundle.getResource("META-INF/resources/div.txt");
 
 									URLConnection urlConnection = null;
 									InputStream inputStream = null;
 									String div = null;
 									
 									try {
-										urlConnection = jsonURL.openConnection();
+										urlConnection = divTxtURL.openConnection();
 
 										inputStream = urlConnection.getInputStream();
 
