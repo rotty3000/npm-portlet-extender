@@ -2,6 +2,7 @@ package com.liferay.npm.portlet.extender;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Dictionary;
@@ -10,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.portlet.Portlet;
+import javax.portlet.RenderRequest;
+import javax.portlet.RenderResponse;
 
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
@@ -29,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.portlet.LiferayPortlet;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -73,8 +76,6 @@ public class NPMPortletExtender implements BundleActivator {
 							System.out.println("json object: " + jsonObject.toString());
 
 							// register portlet service
-							Portlet portlet = new MVCPortlet();
-
 							Bundle extenderBundle = FrameworkUtil.getBundle(this.getClass());
 							
 							BundleContext extenderBundleContext = extenderBundle.getBundleContext();
@@ -93,6 +94,24 @@ public class NPMPortletExtender implements BundleActivator {
 								}
 							}
 							
+							Portlet portlet = new LiferayPortlet() {
+								
+								@Override
+								public void render(RenderRequest request, RenderResponse response) {
+									PrintWriter writer = null;;
+
+									try {
+										writer = response.getWriter();
+									}
+									catch (IOException ioe) {
+										_logger.error(ioe.getLocalizedMessage());
+									}
+									
+									writer.println("<p>Hello, world!</p>");
+								}
+
+							};
+
 							ServiceRegistration<Portlet> serviceRegistration =
 								extenderBundleContext.registerService(Portlet.class, portlet, serviceProperties);
 							
