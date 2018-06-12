@@ -144,11 +144,6 @@ public class NPMPortletExtender implements BundleActivator {
 		return false;
 	}
 
-	private NPMPortletMetadata _getMetaData() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 	private static final Logger _logger = LoggerFactory.getLogger(NPMPortletExtender.class);
 
 	private BundleTracker<ServiceRegistration<Portlet>> _bundleTracker;
