@@ -1,5 +1,11 @@
 package com.liferay.npm.portlet.extender;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.Dictionary;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -9,9 +15,9 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleEvent;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.framework.wiring.BundleCapability;
-import org.osgi.framework.wiring.BundleRequirement;
 import org.osgi.framework.wiring.BundleWire;
 import org.osgi.framework.wiring.BundleWiring;
 import org.osgi.namespace.extender.ExtenderNamespace;
@@ -19,6 +25,13 @@ import org.osgi.util.tracker.BundleTracker;
 import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.liferay.portal.kernel.json.JSONException;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
+import com.liferay.portal.kernel.json.JSONObject;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
+import com.liferay.portal.kernel.util.HashMapDictionary;
+import com.liferay.portal.kernel.util.StringUtil;
 
 public class NPMPortletExtender implements BundleActivator {
 
@@ -31,10 +44,59 @@ public class NPMPortletExtender implements BundleActivator {
 					public ServiceRegistration<Portlet> addingBundle(Bundle bundle, BundleEvent event) {
 						if (_optIn(bundle)) {
 							System.out.println("Found bundle with opt-in: " + bundle.getSymbolicName());
-							
+
 							// read package.json metadata
-							
+							URL jsonURL = bundle.getResource("META-INF/resources/package.json");
+
+							URLConnection urlConnection = null;
+							InputStream inputStream = null;
+							JSONObject jsonObject = null;
+
+							try {
+								urlConnection = jsonURL.openConnection();
+
+								inputStream = urlConnection.getInputStream();
+
+								jsonObject = JSONFactoryUtil.createJSONObject(StringUtil.read(inputStream));
+							}
+							catch (IOException ioe) {
+								_logger.error(ioe.getLocalizedMessage());
+
+								return null;
+							}
+							catch (JSONException jsone) {
+								_logger.error(jsone.getLocalizedMessage());
+
+								return null;
+							}
+
+							System.out.println("json object: " + jsonObject.toString());
+
 							// register portlet service
+							Portlet portlet = new MVCPortlet();
+
+							Bundle extenderBundle = FrameworkUtil.getBundle(this.getClass());
+							
+							BundleContext extenderBundleContext = extenderBundle.getBundleContext();
+							
+							Dictionary<String, String> serviceProperties = new HashMapDictionary<>();
+							
+							JSONObject portletJSONObject = jsonObject.getJSONObject("portlet");
+							
+							if (portletJSONObject != null) {
+								Iterator<String> keys = portletJSONObject.keys();
+								
+								while (keys.hasNext()) {
+									String key = keys.next();
+
+									serviceProperties.put(key, portletJSONObject.getString(key));
+								}
+							}
+							
+							ServiceRegistration<Portlet> serviceRegistration =
+								extenderBundleContext.registerService(Portlet.class, portlet, serviceProperties);
+							
+							return serviceRegistration;
 						}
 
 						return null;
