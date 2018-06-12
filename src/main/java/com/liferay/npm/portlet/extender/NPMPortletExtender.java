@@ -86,6 +86,14 @@ public class NPMPortletExtender implements BundleActivator {
 								
 								while (keys.hasNext()) {
 									String key = keys.next();
+									
+									// TODO:
+									// We need to restrict the types to strings and arrays of strings.
+									// Thus we need to do this extra work:
+									// If the return type is String, then you're fine.
+									// If it's JSONObject, then use toString
+									// If it's JSONArray, convert each value of that array into toString
+									// and collect those into a real array
 
 									serviceProperties.put(key, portletJSONObject.getString(key));
 								}
