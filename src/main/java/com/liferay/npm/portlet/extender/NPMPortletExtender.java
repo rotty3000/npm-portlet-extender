@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
-import com.liferay.portal.kernel.portlet.LiferayPortlet;
+import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.liferay.portal.kernel.util.HashMapDictionary;
 import com.liferay.portal.kernel.util.StringUtil;
 
@@ -76,9 +76,7 @@ public class NPMPortletExtender implements BundleActivator {
 							System.out.println("json object: " + jsonObject.toString());
 
 							// register portlet service
-							Bundle extenderBundle = FrameworkUtil.getBundle(this.getClass());
-							
-							BundleContext extenderBundleContext = extenderBundle.getBundleContext();
+							BundleContext bundleContext = bundle.getBundleContext();
 							
 							Dictionary<String, String> serviceProperties = new HashMapDictionary<>();
 							
@@ -94,7 +92,7 @@ public class NPMPortletExtender implements BundleActivator {
 								}
 							}
 							
-							Portlet portlet = new LiferayPortlet() {
+							Portlet portlet = new MVCPortlet() {
 								
 								@Override
 								public void render(RenderRequest request, RenderResponse response) {
@@ -132,7 +130,7 @@ public class NPMPortletExtender implements BundleActivator {
 							};
 
 							ServiceRegistration<Portlet> serviceRegistration =
-								extenderBundleContext.registerService(Portlet.class, portlet, serviceProperties);
+								bundleContext.registerService(Portlet.class, portlet, serviceProperties);
 							
 							return serviceRegistration;
 						}
