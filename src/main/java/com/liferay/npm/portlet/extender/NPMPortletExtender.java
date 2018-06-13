@@ -59,8 +59,10 @@ public class NPMPortletExtender implements BundleActivator {
 								urlConnection = jsonURL.openConnection();
 
 								inputStream = urlConnection.getInputStream();
+								
+								String jsonString = StringUtil.read(inputStream);
 
-								jsonObject = JSONFactoryUtil.createJSONObject(StringUtil.read(inputStream));
+								jsonObject = JSONFactoryUtil.createJSONObject(jsonString);
 							}
 							catch (IOException ioe) {
 								_logger.error(ioe.getLocalizedMessage());
