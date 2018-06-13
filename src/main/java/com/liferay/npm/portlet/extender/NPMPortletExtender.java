@@ -28,6 +28,7 @@ import org.osgi.util.tracker.BundleTrackerCustomizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
@@ -77,7 +78,7 @@ public class NPMPortletExtender implements BundleActivator {
 							// register portlet service
 							BundleContext bundleContext = bundle.getBundleContext();
 							
-							Dictionary<String, String> serviceProperties = new HashMapDictionary<>();
+							Dictionary<String, Object> serviceProperties = new HashMapDictionary<>();
 							
 							JSONObject portletJSONObject = jsonObject.getJSONObject("portlet");
 							
@@ -87,13 +88,37 @@ public class NPMPortletExtender implements BundleActivator {
 								while (keys.hasNext()) {
 									String key = keys.next();
 									
-									// TODO:
-									// We need to restrict the types to strings and arrays of strings.
-									// Thus we need to do this extra work:
-									// If the return type is String, then you're fine.
-									// If it's JSONObject, then use toString
-									// If it's JSONArray, convert each value of that array into toString
-									// and collect those into a real array
+									Object value = portletJSONObject.get(key);
+									
+									if (value instanceof JSONObject) {
+										String stringValue = value.toString();
+
+										serviceProperties.put(key, stringValue);
+									}
+									else if (value instanceof JSONArray) {
+										int length = ((JSONArray) value).length();
+										
+										String[] stringValuesArray = new String[length];
+										
+										for (int i = 0; i < length; i++) {
+											Object arrayValue = ((JSONArray) value).get(i);
+											
+											String arrayValueString = arrayValue.toString();
+											
+											stringValuesArray[i] = arrayValueString;
+										}
+
+										serviceProperties.put(key, stringValuesArray);
+									}
+									else if (value instanceof String) {
+										serviceProperties.put(key, (String) value);
+									}
+									else {
+										_logger.error(
+											"Invalid portlet section in " +
+											"package.json. The portlet section " +
+											"must only contains strings and arrays of strings.");
+									}
 
 									serviceProperties.put(key, portletJSONObject.getString(key));
 								}
