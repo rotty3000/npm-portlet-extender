@@ -41,10 +41,10 @@ public class NPMPortletExtender implements BundleActivator {
 	@Override
 	public void start(BundleContext context) throws Exception {
 		_bundleTracker = new BundleTracker<>(context, Bundle.ACTIVE,
-				new BundleTrackerCustomizer<ServiceRegistration<Portlet>>() {
+				new BundleTrackerCustomizer<ServiceRegistration<?>>() {
 
 					@Override
-					public ServiceRegistration<Portlet> addingBundle(Bundle bundle, BundleEvent event) {
+					public ServiceRegistration<?> addingBundle(Bundle bundle, BundleEvent event) {
 						if (_optIn(bundle)) {
 							System.out.println("Found bundle with opt-in: " + bundle.getSymbolicName());
 
@@ -167,8 +167,8 @@ public class NPMPortletExtender implements BundleActivator {
 
 							};
 
-							ServiceRegistration<Portlet> serviceRegistration =
-								bundleContext.registerService(Portlet.class, portlet, serviceProperties);
+							ServiceRegistration<?> serviceRegistration =
+								bundleContext.registerService(new String[] {Portlet.class.getName()}, portlet, serviceProperties);
 							
 							return serviceRegistration;
 						}
@@ -177,12 +177,12 @@ public class NPMPortletExtender implements BundleActivator {
 					}
 
 					@Override
-					public void modifiedBundle(Bundle bundle, BundleEvent event, ServiceRegistration<Portlet> registration) {
+					public void modifiedBundle(Bundle bundle, BundleEvent event, ServiceRegistration<?> registration) {
 
 					}
 
 					@Override
-					public void removedBundle(Bundle bundle, BundleEvent event, ServiceRegistration<Portlet> registration) {
+					public void removedBundle(Bundle bundle, BundleEvent event, ServiceRegistration<?> registration) {
 						if (registration != null) {
 							registration.unregister();
 						}
@@ -220,6 +220,6 @@ public class NPMPortletExtender implements BundleActivator {
 
 	private static final Logger _logger = LoggerFactory.getLogger(NPMPortletExtender.class);
 
-	private BundleTracker<ServiceRegistration<Portlet>> _bundleTracker;
+	private BundleTracker<ServiceRegistration<?>> _bundleTracker;
 
 }
