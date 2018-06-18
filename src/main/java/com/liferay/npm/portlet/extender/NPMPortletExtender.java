@@ -212,7 +212,7 @@ public class NPMPortletExtender implements BundleActivator {
 
 				writer.print("<div id=\"npm-portlet-");
 				writer.print(response.getNamespace());
-				writer.println("\" />");
+				writer.println("\"></div>");
 				writer.println("<script type=\"text/javascript\">");
 				writer.print("Liferay.Loader.require(\"");
 				writer.print(_name);
